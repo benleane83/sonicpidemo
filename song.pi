@@ -24,3 +24,11 @@ live_loop :choir do
   play :e3, sustain: 4, release: 2
   sleep 4
 end
+
+live_loop :rhodesy do
+  use_synth :rhodes
+  play_chord [:e3, :g3, :b3], sustain: 2, release: 1
+  sleep 2
+  play_chord [:a3, :c4, :e4], sustain: 2, release: 1
+  sleep 2
+end
