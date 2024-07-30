@@ -1,0 +1,35 @@
+live_loop :bassdrum do
+    sample :bd_haus
+    sleep 1
+  end
+  
+  live_loop :snare do
+    sample :sn_dub, amp: 1.5 if (spread 1, 2).tick
+    sleep 1
+  end
+  
+  live_loop :hihat do
+    sample :drum_cymbal_closed, amp: 0.5
+    sleep 0.25
+  end
+  
+  live_loop :bassline do
+    use_synth :tb303
+    play :e1, release: 0.8, cutoff: 60
+    sleep 1
+  end
+  
+  live_loop :choir do
+    use_synth :hollow
+    play :e3, sustain: 4, release: 2
+    sleep 4
+  end
+  
+  live_loop :rhodesy do
+    use_synth :rhodey
+    play_chord [:e3, :g3, :b3], sustain: 3, release: 2
+    sleep 2
+    play_chord [:a3, :c4, :e4], sustain: 3, release: 2
+    sleep 2
+  end
+  

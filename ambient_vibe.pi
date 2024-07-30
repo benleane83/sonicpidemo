@@ -1,0 +1,58 @@
+a = 0.1 #amplitude globale
+b = -0.3156 #ça c'est pour accorder en 432 hertz
+c = 22.5 #metronome
+highnotes = [:b5-b, :d6-b, :e6-b, :fs5-b]
+melodicnotes = [:g4-b, :a4-b, :b4-b, :d5-b, :e5-b, :fs5-b, :g5-b, :a5-b]
+chordnotes = [:g3-b, :b3-b, :d4-b, :e4-b]
+
+use_bpm c
+
+use_random_seed 30289
+
+with_fx :lpf do
+  live_loop :ambient1 do
+    sample "/home/[My name]/Music/Samples/campfire.mp3", amp: 0.5
+    sleep 40
+  end
+  live_loop :ambient2 do
+    sample :ambi_choir, rate: 0.10, amp: 0.05
+    sleep 1
+  end
+end
+
+with_fx :gverb, damp: 0.5, release: 16, spread: 1, mix: 0.1 do
+  with_fx :compressor do
+    with_fx :echo, decay: 32, phase: 0.8, max_phase: 64, mix: 0.3 do
+      with_fx :flanger, depth: 10, wave: 4, feedback: 0.3, delay: 2 do
+        
+        live_loop :kalihigh do
+          use_synth :kalimba
+          use_synth_defaults clickiness: 0.5, amp: a*3
+          play choose(highnotes), pan: [-1, -0.85, 0.85, 1].choose
+          sleep [0.125, 0.25, 0.5, 1, 2, 7, 8, 9].choose
+        end
+        
+        live_loop :kalimelodic do
+          use_synth :kalimba
+          use_synth_defaults clickiness: 0.5, amp: a*2
+          play choose(melodicnotes), pan: [-1, -0.75, 0.75, 1].choose
+          sleep [0.125, 0.25, 0.5, 1, 2, 3, 4].choose
+        end
+        
+        live_loop :kalichord do
+          use_synth :kalimba
+          use_synth_defaults clickiness: 0.5, amp: a
+          play choose(chordnotes)
+          sleep [1, 1.5, 2, 2.5, 4, 4.5, 6].choose
+        end
+        
+        live_loop :kalibass do
+          use_synth :kalimba
+          use_synth_defaults clickiness: 0.5, amp: a*2
+          play [:e2, :g2, :b2, :d3].choose
+          sleep [3.5, 4, 4.5, 5, 5.5, 6].choose
+        end
+      end
+    end
+  end
+end

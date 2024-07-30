@@ -1,0 +1,40 @@
+#      01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16
+pat = [1, 0, 0, 1, 0, 0, 1, 0, 2, 0, 0, 3, 0, 0, 1, 3]
+
+live_loop :drums do
+  with_fx :reverb do
+    pat.each do |p|
+      use_synth :fm
+      play :e2, release: 0.2, amp: 2 if p == 1
+      sample :drum_bass_hard, amp: 1 if p == 1
+      sample :drum_snare_hard, amp: 1 if p == 2
+      
+      sample :drum_cymbal_closed, amp: 0.5 if p == 0
+      sample :drum_cymbal_open, amp: 0.5, release: 0.2, sustain: 0 if p > 0
+      sleep 0.125
+    end
+  end
+end
+
+live_loop :bass do
+  sync :drums
+  use_synth :prophet
+  # Play on the first count
+  play :c2, release: 3.5, cutoff: rrand(70, 120), amp: 0.5
+  sleep 4 # Wait for four beats (up to the fifth count)
+  # Play on the fifth count
+  play :c2, release: 3.5, cutoff: rrand(70, 120), amp: 0.5
+  sleep 4 # Complete the 8-beat bar
+end
+
+live_loop :keys do
+  with_fx :slicer do
+    sync :drums
+    use_synth :rodeo
+    play (chord :c4, :major7), release: 2, amp: 0.5
+    sleep 2
+    play (chord :f4, :major7), release: 2, amp: 0.5
+    sleep 2
+  end
+end
+

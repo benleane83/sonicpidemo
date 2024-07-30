@@ -1,0 +1,39 @@
+# #[54] ------------------------------
+use_bpm 180
+
+#               1,a,2,a,3,a,4,a,5,a,6,a,7,a,8,a
+CongaHigh  =  [ 0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0 ]
+CongaLow  =   [ 0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1 ]
+Claves  =     [ 1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,0 ]
+Cowbell  =    [ 1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0 ]
+BassGuit  =   [ 0,0,0,1,0,0,2,0,0,0,0,1,0,0,3,0 ]
+Piano =       [ 1,0,0,1,0,1,0,0,2,0,0,2,0,2,0,0 ]
+
+live_loop :percussion do
+  tick
+
+  use_synth :sc808_congamid
+  play 60 if CongaHigh.look == 1
+
+  use_synth :sc808_congalo
+  play 50 if CongaLow.look == 1
+
+  sample :drum_cowbell, rpitch: -3, amp: 0.1 if Cowbell.look == 1
+
+  use_synth :sc808_claves
+  play 90 if Claves.look == 1
+  
+  use_synth :bass_foundation
+  play :g1, cutoff: 40, sustain: 0.5 if BassGuit.look == 1
+  play :c2, cutoff: 40,  sustain: 0.5 if BassGuit.look == 2
+  play :c1, cutoff: 40,  sustain: 0.5 if BassGuit.look == 3
+
+  use_synth :piano
+  
+  # Play G minor chord on the specified beats
+  play_chord (chord :g3, :minor), amp: 0.8, sustain: 0.2 if Piano.look == 1
+  # Play F major chord on the specified beats
+  play_chord (chord :c3, :minor), amp: 0.8, sustain: 0.2 if Piano.look == 2
+
+  sleep 0.5
+end

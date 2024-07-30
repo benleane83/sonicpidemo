@@ -1,0 +1,64 @@
+# Define the live loops for the kick, snare, and bass drum
+
+live_loop :kick do
+    sample :bd_808, amp: 2 # Play the kick drum at a higher amplitude
+    sleep 0.5 # Wait for half a beat (4-4 rhythm, so 2 kicks per beat)
+end
+
+live_loop :snare do
+    sleep 0.5 # Offset the snare by half a beat
+    sample :sn_dub, amp: 2 # Play the snare drum
+    sleep 0.5 # Wait for the next snare hit
+end
+
+live_loop :bass_drum do
+    sample :bd_haus, amp: 2 # Play the bass drum
+    sleep 1 # Play the bass drum once every beat
+end
+
+live_loop :hi_hat do
+    sample :drum_cymbal_closed, amp: 1.5 # Play the hi-hat at a moderate amplitude
+    sleep 0.25 # Play the hi-hat on every beat (2 hi-hats per beat in a 4-4 rhythm)
+  end
+
+live_loop :crash_cymbal do
+    sample :drum_cymbal_open, amp: 1.5 # Play the crash cymbal at a moderate amplitude
+    sleep 32 # Wait for 32 beats (8 bars in a 4/4 rhythm) before playing again
+  end
+
+  live_loop :billie_jean_bass do
+    use_synth :fm
+    use_synth_defaults release: 0.3, amp: 0.8
+    
+      play :Fs3, sustain: 0.1
+      sleep 0.25
+      play :Cs3, sustain: 0.1
+      sleep 0.25
+      play :E3, sustain: 0.1
+      sleep 0.25
+      play :Fs3, sustain: 0.1
+      sleep 0.25
+      play :E3, sustain: 0.1
+      sleep 0.25
+      play :Cs3, sustain: 0.1
+      sleep 0.25
+      play :Bb2, sustain: 0.1
+      sleep 0.25
+      play :Cs3, sustain: 0.1
+      sleep 0.25
+    end
+
+with_fx :reverb, room: 0.8 do
+    live_loop :synth_line do
+      use_synth :saw # Use the prophet synth for a rich sound
+      play_chord chord(:fs3, :minor), sustain: 0.01, amp: 0.5
+      sleep 0.75
+      play_chord chord(:gs3, :minor), sustain: 0.01, amp: 0.5
+      sleep 1.25
+      play_chord chord(:a3, :major), sustain: 0.01, amp: 0.5 # D# can also be written as :Ds
+      sleep 0.75
+      play_chord chord(:gs3, :minor), sustain: 0.01, amp: 0.5
+      sleep 1.25
+    end
+ end
+

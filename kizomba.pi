@@ -1,0 +1,55 @@
+# #[54] ------------------------------
+use_bpm 180
+
+ClosedHiHat  = [ 1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,0 ]
+OpenHiHat  =   [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0 ]
+SnareDrum  =   [ 0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0 ]
+Clap  =        [ 1,0,0,1,0,0,1,0,0,0,1,0,1,0,0,0 ]
+BassDrum  =    [ 1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0 ]
+
+live_loop :pattern do
+  tick
+  
+  sample :drum_cymbal_closed, amp: 0.8, rpitch: 5 if ClosedHiHat.look == 1
+  
+  #sample :drum_cymbal_open, release: 0.2, amp: 0.6, sustain: 0 if OpenHiHat.look == 1
+  
+  sample :drum_snare_hard, rpitch: 15 if SnareDrum.look == 1
+  
+  use_synth :sc808_snare
+  play 60, amp: 0.3, pitch: 30 if Clap.look == 1
+  # sample :sn_dolf, amp: 0.3, rpitch: 20 if Clap.look == 1
+  
+  sample :drum_bass_soft if BassDrum.look == 1
+  
+  sleep 0.5
+end
+
+BassGuit  =    [ 1,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0 ]
+
+# Define an array of notes for the bass part
+bass_notes = [:c2, :g1, :f1, :g1]
+
+live_loop :bass do
+  use_synth :bass_foundation
+  
+  # Calculate the index for bass_notes array to change note every 32 ticks
+  note_index = tick / 16 % bass_notes.length
+  
+  current_note = bass_notes[note_index]
+  
+  play current_note, cutoff: 40, sustain: 2 if BassGuit.look == 1
+  play current_note, cutoff: 40,  sustain: 0.5 if BassGuit.look == 2
+  
+  sleep 0.5
+end
+
+live_loop :electric_piano do
+  use_synth :rhodey  # Synth resembling an electric piano
+  
+  # Play an F minor chord on the first two counts of every 8 bars
+  # F minor chord notes: F, Ab, C
+  play (chord :c4, :major), amp: 0.6, release: 2 if tick % 16 < 2
+  sleep 1  # Sleep for 1 beat, making the loop iterate every beat
+end
+
