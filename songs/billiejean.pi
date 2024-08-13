@@ -42,7 +42,7 @@ live_loop :crash_cymbal do
       sleep 0.25
       play :Cs3, sustain: 0.1
       sleep 0.25
-      play :Bb2, sustain: 0.1
+      play :B2, sustain: 0.1
       sleep 0.25
       play :Cs3, sustain: 0.1
       sleep 0.25

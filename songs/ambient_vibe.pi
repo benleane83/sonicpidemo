@@ -11,7 +11,7 @@ use_random_seed 30289
 
 with_fx :lpf do
   live_loop :ambient1 do
-    sample "/home/[My name]/Music/Samples/campfire.mp3", amp: 0.5
+    sample "campfire.mp3", amp: 0.5
     sleep 40
   end
   live_loop :ambient2 do
