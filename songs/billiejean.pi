@@ -13,7 +13,7 @@ end
 
 live_loop :bass_drum do
     sample :bd_haus, amp: 2 # Play the bass drum
-    sleep 1 # Play the bass drum once every beat
+    sleep 0.5 # Play the bass drum once every beat
 end
 
 live_loop :hi_hat do

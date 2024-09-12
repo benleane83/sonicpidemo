@@ -1,0 +1,2 @@
+play_chord [:C4, :Eb4, :G4]
+sleep 1
