@@ -1,0 +1,54 @@
+use_bpm 105
+
+# Afrobeats-style percussion
+live_loop :kick do
+  sample :bd_haus, amp: 2
+  sleep 1
+end
+
+live_loop :perc, sync: :kick do
+  sleep 0.5
+  sample :perc_snap, amp: 1.2
+  sleep 0.5
+end
+
+live_loop :hats, sync: :kick do
+  sleep 0.25
+  sample :drum_cymbal_closed, amp: 0.5, rate: 1.2
+  sleep 0.25
+end
+
+# Syncopated snare
+live_loop :snare, sync: :kick do
+  sleep 0.75
+  sample :sn_zome, amp: 0.8
+  sleep 0.25
+end
+
+# Bassline
+live_loop :bass, sync: :kick do
+  use_synth :fm
+  notes = [:e2, :g2, :b2, :a2, :g2, :e2, :d2, :b2]
+  notes.each do |n|
+    play n, release: 0.3, amp: 1.3
+    sleep 0.5
+  end
+end
+
+# Chords
+live_loop :chords, sync: :kick do
+  use_synth :piano
+  play chord(:e3, :minor7), release: 1.5, amp: 1.2
+  sleep 2
+  play chord(:a3, :minor7), release: 1.5, amp: 1.2
+  sleep 2
+end
+
+# Melody
+live_loop :melody, sync: :kick do
+  use_synth :pluck
+  with_fx :reverb, mix: 0.3 do
+    play_pattern_timed [:b4, :g4, :e4, :a4, :g4, :e4, :d4, :b4], [0.5, 0.25, 0.25, 0.5, 0.25, 0.25, 0.5, 0.5], release: 0.3, amp: 1.1
+  end
+  sleep 4
+end

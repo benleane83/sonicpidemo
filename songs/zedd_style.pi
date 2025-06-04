@@ -1,0 +1,55 @@
+use_bpm 128  # "Clarity" is around 128 BPM, but the feel is half-time
+
+# Atmospheric chords
+live_loop :chords do
+  use_synth :prophet
+  with_fx :reverb, mix: 0.6, room: 0.8 do
+    play chord(:g3, :major7), release: 4, cutoff: 90
+    sleep 4
+    play chord(:d4, :major7), release: 4, cutoff: 90
+    sleep 4
+    play chord(:e4, :minor7), release: 4, cutoff: 90
+    sleep 4
+    play chord(:c4, :major7), release: 4, cutoff: 90
+    sleep 4
+  end
+end
+
+# Soft kick (half-time feel)
+live_loop :kick do
+  sample :bd_haus, amp: 1.5
+  sleep 2
+end
+
+# Snare (half-time, on beat 3)
+live_loop :snare, sync: :kick do
+  sleep 2
+  sample :sn_dolf, amp: 1.2
+  sleep 2
+end
+
+# Hi-hats (gentle, syncopated)
+live_loop :hats, sync: :kick do
+  sleep 0.5
+  sample :drum_cymbal_closed, amp: 0.4, rate: 1.2
+  sleep 0.5
+end
+
+# Bassline (simple, emotional)
+live_loop :bass, sync: :kick do
+  use_synth :fm
+  notes = [:g2, :d3, :e3, :c3]
+  notes.each do |n|
+    play n, release: 0.5, amp: 1.2
+    sleep 4
+  end
+end
+
+# Melodic lead (echoed, emotional)
+live_loop :lead, sync: :kick do
+  use_synth :blade
+  with_fx :echo, mix: 0.5, phase: 0.75 do
+    play_pattern_timed [:b4, :a4, :g4, :d5, :e5, :d5, :b4, :a4], [0.5, 0.5, 1, 0.5, 0.5, 1, 0.5, 0.5], release: 0.4, amp: 1.1
+  end
+  sleep 8
+end
