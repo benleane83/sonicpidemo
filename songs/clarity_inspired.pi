@@ -1,0 +1,353 @@
+# Clarity - EDM/Electro House Style (Inspired by Zedd)
+# Created with GitHub Copilot using prompt template
+# Key: A♭ Major (Ab Major)
+# BPM: 130
+# Chord Progression: A♭ – Fm – Cm – D♭
+
+use_bpm 130
+
+# Define chord progression in Ab Major (1st, 6th, 3rd, 4th degrees)
+define :chord_progression do |bass_octave = 3, chord_octave = 4|
+  [
+    { root: :ab, chord: chord(:ab, :major, num_octaves: 1), bass: note(:ab, octave: bass_octave) },
+    { root: :f, chord: chord(:f, :minor, num_octaves: 1), bass: note(:f, octave: bass_octave) },
+    { root: :c, chord: chord(:c, :minor, num_octaves: 1), bass: note(:c, octave: bass_octave) },
+    { root: :db, chord: chord(:db, :major, num_octaves: 1), bass: note(:db, octave: bass_octave) }
+  ]
+end
+
+# Main melody based on Ab major scale with emphasis on 3rd and 5th
+define :main_melody do
+  use_synth :prophet
+  # Soaring melody with syncopated rhythm - C (3rd) and Eb (5th) emphasized
+  melody_notes = [:ab4, :c5, :eb5, :db5, :c5, :bb4, :ab4, :f4, :ab4, :c5, :eb5, :f5, :eb5, :db5, :c5, :ab4]
+  melody_durations = [0.5, 0.75, 1, 0.25, 0.5, 0.5, 1, 0.5, 0.5, 0.75, 1, 0.5, 0.5, 0.5, 1, 1]
+  
+  with_fx :reverb, mix: 0.4, room: 0.8 do
+    with_fx :echo, phase: 0.375, mix: 0.2 do
+      melody_notes.zip(melody_durations).each do |note, duration|
+        play note, release: duration * 0.9, amp: 1.0, cutoff: 100
+        sleep duration
+      end
+    end
+  end
+end
+
+# Sidechain compression effect for that pumping EDM sound
+define :sidechain do |&block|
+  with_fx :compressor, threshold: 0.25, clamp_time: 0.01, slope_above: 0.7, relax_time: 0.1 do
+    block.call
+  end
+end
+
+# Piano intro and breakdown parts
+define :piano_part do
+  use_synth :piano
+  progression = chord_progression
+  
+  with_fx :reverb, mix: 0.5, room: 0.7 do
+    progression.each do |chord_data|
+      # Play root note in bass
+      play chord_data[:bass], amp: 0.6, release: 1.5
+      sleep 0.25
+      # Arpeggiate the chord
+      chord_data[:chord].each do |note|
+        play note, amp: 0.4, release: 0.8
+        sleep 0.25
+      end
+      sleep 1
+    end
+  end
+end
+
+# Supersaw chords for the drop
+define :supersaw_chords do
+  use_synth :saw
+  progression = chord_progression
+  
+  sidechain do
+    with_fx :lpf, cutoff: 70, cutoff_slide: 4 do |lpf|
+      with_fx :reverb, mix: 0.3 do
+        progression.each do |chord_data|
+          play chord_data[:chord], amp: 0.8, release: 1.8, detune: 0.1
+          control lpf, cutoff: 120
+          sleep 2
+        end
+      end
+    end
+  end
+end
+
+# Punchy sidechained bassline
+define :bass_line do
+  use_synth :bass_foundation
+  progression = chord_progression(2)  # Lower octave for bass
+  
+  sidechain do
+    progression.each do |chord_data|
+      # Rhythmic bass pattern
+      4.times do
+        play chord_data[:bass], amp: 1.2, release: 0.3, cutoff: 80
+        sleep 0.25
+        sleep 0.25  # Rest for sidechain ducking
+      end
+    end
+  end
+end
+
+# === DRUM PATTERNS ===
+
+# Main kick drum
+live_loop :kick do
+  sample :bd_tek, amp: 2.0
+  sleep 1
+end
+
+# Snare/clap on beats 2 and 4
+live_loop :snare, sync: :kick do
+  sleep 1
+  sample :sn_dolf, amp: 1.5
+  sleep 1
+end
+
+# Hi-hat pattern
+live_loop :hats, sync: :kick do
+  sample :drum_cymbal_closed, amp: 0.6, rate: 1.2
+  sleep 0.25
+  sample :drum_cymbal_closed, amp: 0.4, rate: 1.2
+  sleep 0.25
+  sample :drum_cymbal_open, amp: 0.3, rate: 1.0
+  sleep 0.5
+end
+
+# Percussion fills
+live_loop :fills, sync: :kick do
+  sleep 7.5
+  sample :elec_blip, amp: 0.8, rate: 2.0
+  sleep 0.25
+  sample :drum_tom_mid_soft, amp: 0.7
+  sleep 0.25
+end
+
+# === ARRANGEMENT/STRUCTURE ===
+
+# Intro - Ambient pads and piano (8 bars)
+in_thread do
+  puts "🎵 INTRO - Ambient pads and piano"
+  use_synth :hollow
+  with_fx :reverb, mix: 0.7, room: 0.9 do
+    play :ab3, amp: 0.5, sustain: 6, release: 2
+    sleep 4
+    play :eb4, amp: 0.4, sustain: 4, release: 2
+    sleep 4
+  end
+  
+  # Piano enters
+  piano_part
+end
+
+# Verse 1 - Light instrumentation (16 bars)
+in_thread do
+  sleep 16  # After intro
+  puts "🎵 VERSE 1 - Light instrumentation"
+  
+  2.times do
+    piano_part
+  end
+end
+
+# Pre-Chorus - Build-up with rising tension (8 bars)
+in_thread do
+  sleep 48  # After verse 1
+  puts "🎵 PRE-CHORUS - Building tension"
+  
+  use_synth :blade
+  with_fx :hpf, cutoff: 60, cutoff_slide: 4 do |hpf|
+    with_fx :reverb, mix: 0.4 do
+      # Rising arpeggio build
+      [:ab3, :c4, :eb4, :ab4, :c5, :eb5, :ab5].each do |note|
+        play note, amp: 0.8, release: 0.5
+        control hpf, cutoff: 120
+        sleep 0.5
+      end
+      
+      # Riser effect
+      sample :ambi_drone, amp: 0.6, rate: 0.5, finish: 0.8
+      sleep 4.5
+    end
+  end
+end
+
+# Chorus/Drop 1 - Full synths and drums (16 bars)
+in_thread do
+  sleep 64  # After pre-chorus
+  puts "🎵 CHORUS/DROP 1 - Full energy!"
+  
+  in_thread do
+    supersaw_chords
+  end
+  
+  in_thread do
+    bass_line
+  end
+  
+  sleep 8
+  main_melody
+end
+
+# Verse 2 - Similar to first verse with variation (16 bars)
+in_thread do
+  sleep 96  # After chorus 1
+  puts "🎵 VERSE 2 - Variation"
+  
+  # Add some subtle lead elements
+  in_thread do
+    use_synth :blade
+    with_fx :echo, phase: 0.5, mix: 0.3 do
+      play :ab4, amp: 0.3, release: 2
+      sleep 4
+      play :c5, amp: 0.3, release: 2
+      sleep 4
+      play :eb5, amp: 0.3, release: 2
+      sleep 8
+    end
+  end
+  
+  2.times do
+    piano_part
+  end
+end
+
+# Pre-Chorus 2 - Repeated with variation (8 bars)
+in_thread do
+  sleep 128  # After verse 2
+  puts "🎵 PRE-CHORUS 2 - Intensified build"
+  
+  use_synth :prophet
+  with_fx :lpf, cutoff: 40, cutoff_slide: 6 do |lpf|
+    with_fx :reverb, mix: 0.5 do
+      # More intense build with filter sweep
+      progression = chord_progression
+      progression.each do |chord_data|
+        play chord_data[:chord], amp: 0.9, release: 1.5
+        control lpf, cutoff: 130
+        sleep 2
+      end
+    end
+  end
+end
+
+# Chorus/Drop 2 - Repeated with added layers (16 bars)
+in_thread do
+  sleep 144  # After pre-chorus 2
+  puts "🎵 CHORUS/DROP 2 - Maximum energy!"
+  
+  # Layer 1: Supersaw chords
+  in_thread do
+    supersaw_chords
+  end
+  
+  # Layer 2: Bass
+  in_thread do
+    bass_line
+  end
+  
+  # Layer 3: Additional lead
+  in_thread do
+    use_synth :blade
+    with_fx :reverb, mix: 0.3 do
+      sleep 4
+      [:ab5, :f5, :c5, :db5, :eb5, :ab5].each do |note|
+        play note, amp: 0.8, release: 0.8
+        sleep 1
+      end
+      sleep 2
+    end
+  end
+  
+  # Main melody
+  sleep 8
+  main_melody
+end
+
+# Bridge - Stripped down, emotional (8 bars)
+in_thread do
+  sleep 176  # After chorus 2
+  puts "🎵 BRIDGE - Emotional breakdown"
+  
+  # Just piano and soft pads
+  use_synth :piano
+  with_fx :reverb, mix: 0.6, room: 0.8 do
+    play chord(:ab4, :major), amp: 0.5, release: 2
+    sleep 2
+    play chord(:f4, :minor), amp: 0.5, release: 2
+    sleep 2
+    play chord(:c4, :minor), amp: 0.5, release: 2
+    sleep 2
+    play chord(:db4, :major), amp: 0.5, release: 2
+    sleep 2
+  end
+end
+
+# Final Chorus/Drop - Climactic (16 bars)
+in_thread do
+  sleep 192  # After bridge
+  puts "🎵 FINAL CHORUS - Climactic!"
+  
+  # All layers at maximum intensity
+  in_thread do
+    supersaw_chords
+  end
+  
+  in_thread do
+    bass_line
+  end
+  
+  in_thread do
+    use_synth :prophet
+    with_fx :reverb, mix: 0.4 do
+      # Harmony line
+      [:c5, :ab4, :f5, :eb5, :db5, :c5, :bb4, :ab4].each do |note|
+        play note, amp: 0.7, release: 1
+        sleep 1
+      end
+      sleep 8
+    end
+  end
+  
+  # Main melody with extra power
+  sleep 8
+  main_melody
+end
+
+# Outro - Fade out with piano and pads (8 bars)
+in_thread do
+  sleep 224  # After final chorus
+  puts "🎵 OUTRO - Fade to tranquility"
+  
+  # Ambient outro
+  use_synth :hollow
+  with_fx :reverb, mix: 0.8, room: 0.9 do
+    play :ab3, amp: 0.4, sustain: 4, release: 4
+    sleep 4
+    play :eb4, amp: 0.3, sustain: 2, release: 6
+    sleep 4
+  end
+  
+  # Final piano chord
+  use_synth :piano
+  with_fx :reverb, mix: 0.7 do
+    play chord(:ab4, :major), amp: 0.4, release: 4
+    sleep 8
+  end
+  
+  puts "🎵 Track complete! Total duration: ~240 beats (3+ minutes at 130 BPM)"
+end
+
+# Performance notes:
+# - Total structure follows EDM arrangement principles
+# - Sidechain compression creates the "pumping" effect
+# - Filter automation and builds create tension
+# - Multiple layers in drops for maximum impact
+# - Emotional bridge provides contrast
+# - All timings calculated for seamless flow
