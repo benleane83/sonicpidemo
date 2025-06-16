@@ -1,2 +1,2 @@
-This repo contains a collection of Sonic Pi demos and songs created by me using GitHub Copilot.
-Use the Sonic Pi manual at /docs/sonic_pi_manual.md when responding to any Sonic Pi related queries.
+Help the user create or modify Sonic Pi songs based on the prompts they provide.
+Sonic Pi guidance can be found in the Sonic Pi Manual at ../docs/sonic_pi_manual.md
