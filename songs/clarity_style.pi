@@ -1,0 +1,376 @@
+# Clarity - Zedd Style EDM Track
+# Created on June 16, 2025
+# Tempo: 130 BPM | Key: A♭ Major
+# Chord Progression: A♭ – Fm – Cm – D♭
+
+use_bpm 130
+
+# Define chord progressions in A♭ Major
+define :main_chords do
+  return [[:ab4, :c5, :eb5], [:f4, :ab4, :c5], [:c4, :eb4, :g4], [:db4, :f4, :ab4]]
+end
+
+define :bass_notes do
+  return [:ab2, :f2, :c3, :db3]
+end
+
+# Global sidechain control
+live_loop :sidechain_trigger do
+  set :sidechain, 1
+  sleep 0.05
+  set :sidechain, 0
+  sleep 0.45
+end
+
+# INTRO - Ambient pads and piano (8 bars)
+# === INTRO ===
+
+with_fx :reverb, mix: 0.8, room: 0.9 do
+  with_fx :echo, phase: 0.75, mix: 0.3 do
+    2.times do
+      main_chords.each do |chord|
+        use_synth :hollow
+        play chord, sustain: 1.5, release: 2, amp: 0.4
+        sleep 2
+      end
+    end
+  end
+end
+
+# Piano intro
+use_synth :piano
+with_fx :reverb, mix: 0.6 do
+  2.times do
+    play :ab4, release: 0.5, amp: 0.6
+    sleep 0.5
+    play :c5, release: 0.5, amp: 0.6
+    sleep 0.5
+    play :eb5, release: 1, amp: 0.6
+    sleep 1
+  end
+end
+
+# VERSE 1 - Light instrumentation (16 bars)
+# === VERSE 1 ===
+
+live_loop :verse_drums, sync: :sidechain_trigger do
+  4.times do
+    sample :bd_tek, amp: 0.8
+    sleep 1
+    sample :sn_dolf, amp: 0.6
+    sleep 1
+  end
+  stop
+end
+
+live_loop :verse_bass, sync: :sidechain_trigger do
+  use_synth :fm
+  with_fx :hpf, cutoff: 60 do
+    4.times do
+      bass_notes.each do |note|
+        play note, release: 0.8, amp: 0.7 * (1 - get[:sidechain])
+        sleep 2
+      end
+    end
+  end
+  stop
+end
+
+live_loop :verse_chords, sync: :sidechain_trigger do
+  use_synth :prophet
+  with_fx :reverb, mix: 0.5 do
+    4.times do
+      main_chords.each do |chord|
+        play chord, release: 1.5, amp: 0.5 * (1 - get[:sidechain])
+        sleep 2
+      end
+    end
+  end
+  stop
+end
+
+# PRE-CHORUS - Build-up (8 bars)
+# === PRE-CHORUS ===
+
+# Riser effect
+with_fx :hpf, cutoff: 60 do
+  with_fx :echo, phase: 0.25 do
+    32.times do |i|
+      with_fx :lpf, cutoff: 60 + i * 2 do
+        synth :noise, release: 0.1, amp: 0.1 + i * 0.01
+      end
+      sleep 0.25
+    end
+  end
+end
+
+# Snare roll
+16.times do |i|
+  sample :sn_dolf, rate: 1 + i * 0.02, amp: 0.4 + i * 0.03
+  sleep 0.5
+end
+
+# CHORUS/DROP - Full energy (16 bars)
+# === CHORUS/DROP ===
+
+live_loop :drop_kick, sync: :sidechain_trigger do
+  16.times do
+    sample :bd_tek, amp: 1.2
+    sleep 0.5
+    sample :drum_cymbal_closed, amp: 0.4
+    sleep 0.5
+  end
+  stop
+end
+
+live_loop :drop_snare, sync: :sidechain_trigger do
+  16.times do
+    sleep 1
+    sample :sn_dolf, amp: 0.9
+    sleep 1
+  end
+  stop
+end
+
+live_loop :drop_supersaw, sync: :sidechain_trigger do
+  use_synth :saw
+  with_fx :reverb, mix: 0.4 do
+    with_fx :lpf, cutoff: 100 do
+      4.times do
+        main_chords.each do |chord|
+          play chord, release: 1.8, amp: 1.1 * (1 - get[:sidechain] * 0.7)
+          sleep 2
+        end
+      end
+    end
+  end
+  stop
+end
+
+live_loop :drop_lead, sync: :sidechain_trigger do
+  use_synth :blade
+  with_fx :reverb, mix: 0.6 do
+    with_fx :echo, phase: 0.375, mix: 0.3 do
+      # Soaring lead melody emphasizing 3rd and 5th
+      melody = [:c6, :eb6, :g6, :eb6, :c6, :ab5, :c6, :eb6,
+                :ab5, :c6, :eb6, :c6, :ab5, :f5, :ab5, :c6]
+      melody.each do |note|
+        play note, release: 0.4, amp: 1.3
+        sleep 0.5
+      end
+    end
+  end
+  stop
+end
+
+live_loop :drop_bass, sync: :sidechain_trigger do
+  use_synth :fm
+  with_fx :lpf, cutoff: 80 do
+    4.times do
+      bass_notes.each do |note|
+        play note, release: 0.6, amp: 1.0 * (1 - get[:sidechain] * 0.8)
+        sleep 0.5
+        play note, octave: 1, release: 0.3, amp: 0.8 * (1 - get[:sidechain] * 0.8)
+        sleep 0.5
+        sleep 1
+      end
+    end
+  end
+  stop
+end
+
+# VERSE 2 - Similar to first verse (16 bars)
+# === VERSE 2 ===
+
+live_loop :verse2_drums, sync: :sidechain_trigger do
+  4.times do
+    sample :bd_tek, amp: 0.8
+    sleep 1
+    sample :sn_dolf, amp: 0.6
+    sleep 0.5
+    sample :drum_cymbal_open, amp: 0.3
+    sleep 0.5
+  end
+  stop
+end
+
+live_loop :verse2_arps, sync: :sidechain_trigger do
+  use_synth :prophet
+  with_fx :echo, phase: 0.5, mix: 0.4 do
+    4.times do
+      [:ab4, :c5, :eb5, :g5, :ab5, :g5, :eb5, :c5].each do |note|
+        play note, release: 0.3, amp: 0.7
+        sleep 0.5
+      end
+    end
+  end
+  stop
+end
+
+# PRE-CHORUS 2 - With variation (8 bars)
+# === PRE-CHORUS 2 ===
+
+# Enhanced riser with filter sweep
+with_fx :hpf, cutoff: 70 do
+  with_fx :echo, phase: 0.125 do
+    32.times do |i|
+      with_fx :lpf, cutoff: 70 + i * 3 do
+        synth :noise, release: 0.15, amp: 0.15 + i * 0.015
+      end
+      with_fx :lpf, cutoff: 60 + i * 2 do
+        synth :prophet, note: :ab5, release: 0.1, amp: 0.1
+      end
+      sleep 0.25
+    end
+  end
+end
+
+# Layered percussion fills
+16.times do |i|
+  sample :sn_dolf, rate: 1 + i * 0.025, amp: 0.5 + i * 0.02
+  sample :elec_blip, rate: 2 + i * 0.1, amp: 0.3
+  sleep 0.5
+end
+
+# CHORUS/DROP 2 - Added layers (16 bars)
+# === CHORUS/DROP 2 ===
+
+live_loop :drop2_kick, sync: :sidechain_trigger do
+  16.times do
+    sample :bd_tek, amp: 1.3
+    sleep 0.5
+    sample :drum_cymbal_closed, amp: 0.5
+    sleep 0.25
+    sample :drum_cymbal_open, amp: 0.3
+    sleep 0.25
+  end
+  stop
+end
+
+live_loop :drop2_supersaw, sync: :sidechain_trigger do
+  use_synth :saw
+  with_fx :reverb, mix: 0.5 do
+    with_fx :lpf, cutoff: 110 do
+      4.times do
+        main_chords.each do |chord|
+          play chord, release: 1.8, amp: 1.2 * (1 - get[:sidechain] * 0.7)
+          play chord, octave: 1, release: 1.5, amp: 0.6 * (1 - get[:sidechain] * 0.5)
+          sleep 2
+        end
+      end
+    end
+  end
+  stop
+end
+
+live_loop :drop2_lead, sync: :sidechain_trigger do
+  use_synth :blade
+  with_fx :reverb, mix: 0.7 do
+    with_fx :echo, phase: 0.25, mix: 0.4 do
+      # More elaborate lead melody
+      melody = [:c6, :eb6, :g6, :ab6, :g6, :eb6, :c6, :ab5,
+                :f5, :ab5, :c6, :eb6, :g6, :f6, :eb6, :db6]
+      melody.each do |note|
+        play note, release: 0.5, amp: 1.4
+        sleep 0.5
+      end
+    end
+  end
+  stop
+end
+
+# BRIDGE - Stripped down, emotional (8 bars)
+# === BRIDGE ===
+
+use_synth :piano
+with_fx :reverb, mix: 0.8 do
+  4.times do
+    main_chords.each do |chord|
+      play chord, release: 1.5, amp: 0.8
+      sleep 2
+    end
+  end
+end
+
+# Soft vocal-like synth
+use_synth :prophet
+with_fx :reverb, mix: 0.9 do
+  [:ab4, :c5, :eb5, :g5, :ab5, :g5, :eb5, :c5].each do |note|
+    play note, sustain: 1, release: 2, amp: 0.6
+    sleep 2
+  end
+end
+
+# FINAL CHORUS/DROP - Climactic (16 bars)
+# === FINAL CHORUS/DROP ===
+
+live_loop :final_kick, sync: :sidechain_trigger do
+  16.times do
+    sample :bd_tek, amp: 1.4
+    sleep 0.5
+    sample :drum_cymbal_closed, amp: 0.6
+    sleep 0.25
+    sample :drum_cymbal_open, amp: 0.4
+    sleep 0.25
+  end
+  stop
+end
+
+live_loop :final_layers, sync: :sidechain_trigger do
+  use_synth :saw
+  with_fx :reverb, mix: 0.6 do
+    4.times do
+      main_chords.each do |chord|
+        # Multiple octaves for thickness
+        play chord, release: 1.8, amp: 1.3 * (1 - get[:sidechain] * 0.7)
+        play chord, octave: 1, release: 1.5, amp: 0.8 * (1 - get[:sidechain] * 0.5)
+        play chord, octave: -1, release: 2, amp: 0.4 * (1 - get[:sidechain] * 0.3)
+        sleep 2
+      end
+    end
+  end
+  stop
+end
+
+live_loop :final_lead, sync: :sidechain_trigger do
+  use_synth :blade
+  with_fx :reverb, mix: 0.8 do
+    with_fx :echo, phase: 0.1875, mix: 0.5 do
+      # Euphoric climactic melody
+      melody = [:c6, :eb6, :g6, :ab6, :bb6, :ab6, :g6, :eb6,
+                :c6, :ab5, :c6, :eb6, :g6, :ab6, :g6, :c7]
+      melody.each do |note|
+        play note, release: 0.6, amp: 1.5
+        sleep 0.5
+      end
+    end
+  end
+  stop
+end
+
+# OUTRO - Fade out with piano and pads (8 bars)
+# === OUTRO ===
+
+use_synth :piano
+with_fx :reverb, mix: 0.9 do
+  4.times do |i|
+    fade_amp = 0.8 - (i * 0.2)
+    main_chords.each do |chord|
+      play chord, release: 2, amp: fade_amp
+      sleep 2
+    end
+  end
+end
+
+# Final atmospheric pad
+with_fx :reverb, mix: 1, room: 1 do
+  with_fx :echo, phase: 1, mix: 0.8 do
+    4.times do |i|
+      fade_amp = 0.6 - (i * 0.15)
+      synth :hollow, note: :ab4, sustain: 3, release: 4, amp: fade_amp
+      sleep 2
+    end
+  end
+end
+
+# === END ===
